@@ -1,0 +1,183 @@
+Public Function warning_exit(flag As Boolean, warning As String) As Boolean
+  If flag = True Then
+    If MsgBox(warning, vbOKCancel + vbExclamation) = vbCancel Then
+      Cancel = True
+    End If
+  End If
+  warning_exit = Cancel
+End Function
+
+Function include_check_words(includeCheck As Boolean, contents As String, includewordset As String) As Boolean
+  Dim foundflag As Boolean
+
+  includewords = Split(includewordset, ",")
+  foundflag = False
+  For i = LBound(includewords) To UBound(includewords)
+    If InStr(contents, includewords(i)) > 0 Then
+      foundflag = True
+      Exit For
+    End If
+  Next i
+  include_check_words = (includeCheck = foundflag)
+End Function
+
+'メール送信時にチェックするマクロ
+'   機能：メールチェック、メール保存
+'   主なチェック項目：件名、宛先（外部アドレス）、敬称、添付、重要文言
+'
+
+Private Sub Application_ItemSend(ByVal item As Object, Cancel As Boolean)
+  'userセッティング
+  Dim MyDomain As String
+  Dim existExternAddress As Boolean
+  Dim apdMsg As String
+  Dim subContentsStr As String
+
+  '一時保持
+  Dim cnt As Integer
+  Dim strAddress As String
+  Dim contents As String
+
+  'for output
+  Dim fileNames As String
+  Dim message As String
+  Dim externAdd As String
+
+  'temp
+  Dim i As Integer
+  Dim flag As Boolean
+
+  ' 初期値
+  MyDomain = "goodcompay.com"  '＜自社のドメインなど＞
+  MyDomainSecond = "goodcompay.com"  '＜自社のドメインなど＞
+  apdMsg = vbCrLf & "キャンセルを選択すると送信を中断します。"
+
+  cnt = item.Attachments.Count    ' 添付ファイル数
+  strSubject = item.Subject
+  strBody = item.Body
+
+  'MsgBox (cnt & " " & strSubject & vbCrLf & strBody)
+
+  ' メールを保存する
+  item.Save
+
+  ' 宛先なしチェック  ' Outlook 2010などは 標準機能でチェックされます。
+  message = message & "1/7 "
+  If item.To = "" Then
+     message = message & "宛先がありません！"
+  Else
+     message = message & "宛先 .. OK"
+  End If
+
+  ' 件名なしチェック ' Outlook 2010などは 標準機能でチェックされます。
+  message = message & vbCrLf & "2/7 "
+  If strSubject = "" Then
+     message = message & "このメッセージには件名がありません。"
+  Else
+     message = message & "件名あり .. OK"
+  End If
+
+  contents = strSubject & strBody
+
+  ' 添付ファイルチェック
+  message = message & vbCrLf & "3/7 "
+  flag = False
+  If cnt = 0 Then
+    fileNames = "添付ファイル無し"
+    flag = include_check_words(True, contents, "添付,圧縮,xls,ppt,doc,zip")
+    If flag = True Then
+       message = message & "添付ファイルを忘れている可能性があります。"
+    Else
+       message = message & "添付忘れチェック .. OK(添付, zipなどのキーワードなし)"
+    End If
+  Else
+    For i = 1 To cnt
+      fileNames = fileNames & "添付" & i & "：" & item.Attachments.item(i).FileName & vbCrLf
+    Next i
+    message = message & "添付忘れチェック .. OK(" & cnt & "件添付)"
+  End If
+
+  ' 要注意ワードチェック
+  message = message & vbCrLf & "4/7 "
+  flag = False
+  flag = include_check_words(True, contents, "見積,予算,契約,厳禁,金額,内緒,内々") 'Confidential
+  If flag = True Then
+     message = message & "要注意メール!!:重要なメールではありませんか？" & vbCrLf & "    宛先や添付ファイル等を確認して下さい。"
+  Else
+     message = message & "要注意ワードチェック .. OK"
+  End If
+
+  ' 敬称ワードチェック
+  message = message & vbCrLf & "5/7 "
+  subContentsStr =""
+  flag = False
+  includewords = Split(strBody, ",")
+  m = UBound(includewords)
+  If mi > 10 Then
+    mi = 10
+  End If
+  For i = LBound(includewords) To mi
+    subContentsStr = subContentsStr & includewords(i)
+  Next
+  flag = include_check_words(False, subContentsStr, "さん,様,殿,各位,担当者,どの")
+  If flag = True Then
+     message = message & "敬称(様、さんなど)がもれて呼び捨てにしていませんか？"
+  Else
+     message = message & "敬称チェック .. OK"
+  End If
+
+  ' 社外アドレスチェック
+  message = message & vbCrLf & "6/7 "
+  existExternAddressName = ""
+  existExternAddress = False
+
+  For i = 1 To item.Recipients.Count
+    With item.Recipients.item(i)
+      strAddress = .Address
+      If Not (strAddress Like "*" & MyDomain & "*" Or _
+          strAddress Like "*" & MyDomainSecond & "*" _
+          ) Then
+        existExternAddress = True
+        existExternAddressName = existExternAddressName & strAddress & " "
+      End If
+    End With
+  Next
+
+  startTime = Now
+  If existExternAddress = True Then
+    externAdd = "外部メールアドレス：有(" & existExternAddressName & ")"
+    message = message & "外部メールアドレスが宛先にあります。"
+  Else
+     externAdd = "外部メールアドレス：なし"
+     message = message & "外部アドレスチェック .. OK"
+  End If
+
+  flag = warning_exit(True, message & vbCrLf & apdMsg)
+  If flag = True Then
+    Cancel = True
+    Exit Sub
+  End If
+
+  ' 表示メッセージ
+  message = "7/7 最終確認です。送信する前に再度宛先、件名、添付ファイル、本文の書き出し等確認してください。" & vbCrLf & _
+    "To:" & item.To & vbCrLf & _
+    "CC:" & item.CC & vbCrLf & _
+    "BCC:" & item.BCC & vbCrLf & _
+    "送信者:" & item.Session.CurrentUser.Address & vbCrLf & _
+    fileNames & vbCrLf & _
+    externAdd
+
+  If MsgBox(message, vbOKCancel + vbExclamation) = vbCancel Then
+    Cancel = True
+    Exit Sub
+  End If
+
+  Do While DateDiff("s", startTime, Now) < 4 '4秒位内なら再確認
+    If MsgBox("焦らず確認しましょう" & vbCrLf & message, vbOKCancel + vbExclamation) = vbCancel Then
+      Cancel = True
+      Exit Sub
+    End If
+  Loop
+
+  'MsgBox ("送信しました")
+End Sub
