@@ -21,19 +21,19 @@ Function include_check_words(includeCheck As Boolean, contents As String, includ
   include_check_words = (includeCheck = foundflag)
 End Function
 
-'ƒ[ƒ‹‘—M‚Éƒ`ƒFƒbƒN‚·‚éƒ}ƒNƒ
-'   ‹@”\Fƒ[ƒ‹ƒ`ƒFƒbƒNAƒ[ƒ‹•Û‘¶
-'   å‚Èƒ`ƒFƒbƒN€–ÚFŒ–¼Aˆ¶æiŠO•”ƒAƒhƒŒƒXjAŒhÌA“Y•tAd—v•¶Œ¾
+'ãƒ¡ãƒ¼ãƒ«é€ä¿¡æ™‚ã«ãƒã‚§ãƒƒã‚¯ã™ã‚‹ãƒã‚¯ãƒ­
+'   æ©Ÿèƒ½ï¼šãƒ¡ãƒ¼ãƒ«ãƒã‚§ãƒƒã‚¯ã€ãƒ¡ãƒ¼ãƒ«ä¿å­˜
+'   ä¸»ãªãƒã‚§ãƒƒã‚¯é …ç›®ï¼šä»¶åã€å®›å…ˆï¼ˆå¤–éƒ¨ã‚¢ãƒ‰ãƒ¬ã‚¹ï¼‰ã€æ•¬ç§°ã€æ·»ä»˜ã€é‡è¦æ–‡è¨€
 '
 
 Private Sub Application_ItemSend(ByVal item As Object, Cancel As Boolean)
-  'userƒZƒbƒeƒBƒ“ƒO
+  'userã‚»ãƒƒãƒ†ã‚£ãƒ³ã‚°
   Dim MyDomain As String
   Dim existExternAddress As Boolean
   Dim apdMsg As String
   Dim subContentsStr As String
 
-  'ˆê•Û
+  'ä¸€æ™‚ä¿æŒ
   Dim cnt As Integer
   Dim strAddress As String
   Dim contents As String
@@ -47,67 +47,67 @@ Private Sub Application_ItemSend(ByVal item As Object, Cancel As Boolean)
   Dim i As Integer
   Dim flag As Boolean
 
-  ' ‰Šú’l
-  MyDomain = "goodcompay.com"  'ƒ©Ğ‚ÌƒhƒƒCƒ“‚È‚Ç„
-  MyDomainSecond = "goodcompay.com"  'ƒ©Ğ‚ÌƒhƒƒCƒ“‚È‚Ç„
-  apdMsg = vbCrLf & "ƒLƒƒƒ“ƒZƒ‹‚ğ‘I‘ğ‚·‚é‚Æ‘—M‚ğ’†’f‚µ‚Ü‚·B"
+  ' åˆæœŸå€¤
+  MyDomain = "goodcompay.com"  'ï¼œè‡ªç¤¾ã®ãƒ‰ãƒ¡ã‚¤ãƒ³ãªã©ï¼
+  MyDomainSecond = "goodcompay.com"  'ï¼œè‡ªç¤¾ã®ãƒ‰ãƒ¡ã‚¤ãƒ³ãªã©ï¼
+  apdMsg = vbCrLf & "ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã‚’é¸æŠã™ã‚‹ã¨é€ä¿¡ã‚’ä¸­æ–­ã—ã¾ã™ã€‚"
 
-  cnt = item.Attachments.Count    ' “Y•tƒtƒ@ƒCƒ‹”
+  cnt = item.Attachments.Count    ' æ·»ä»˜ãƒ•ã‚¡ã‚¤ãƒ«æ•°
   strSubject = item.Subject
   strBody = item.Body
 
   'MsgBox (cnt & " " & strSubject & vbCrLf & strBody)
 
-  ' ƒ[ƒ‹‚ğ•Û‘¶‚·‚é
+  ' ãƒ¡ãƒ¼ãƒ«ã‚’ä¿å­˜ã™ã‚‹
   item.Save
 
-  ' ˆ¶æ‚È‚µƒ`ƒFƒbƒN  ' Outlook 2010‚È‚Ç‚Í •W€‹@”\‚Åƒ`ƒFƒbƒN‚³‚ê‚Ü‚·B
+  ' å®›å…ˆãªã—ãƒã‚§ãƒƒã‚¯  ' Outlook 2010ãªã©ã¯ æ¨™æº–æ©Ÿèƒ½ã§ãƒã‚§ãƒƒã‚¯ã•ã‚Œã¾ã™ã€‚
   message = message & "1/7 "
   If item.To = "" Then
-     message = message & "ˆ¶æ‚ª‚ ‚è‚Ü‚¹‚ñI"
+     message = message & "[NG]:å®›å…ˆãŒã‚ã‚Šã¾ã›ã‚“ï¼"
   Else
-     message = message & "ˆ¶æ .. OK"
+     message = message & "[OK]:å®›å…ˆ"
   End If
 
-  ' Œ–¼‚È‚µƒ`ƒFƒbƒN ' Outlook 2010‚È‚Ç‚Í •W€‹@”\‚Åƒ`ƒFƒbƒN‚³‚ê‚Ü‚·B
+  ' ä»¶åãªã—ãƒã‚§ãƒƒã‚¯ ' Outlook 2010ãªã©ã¯ æ¨™æº–æ©Ÿèƒ½ã§ãƒã‚§ãƒƒã‚¯ã•ã‚Œã¾ã™ã€‚
   message = message & vbCrLf & "2/7 "
   If strSubject = "" Then
-     message = message & "‚±‚ÌƒƒbƒZ[ƒW‚É‚ÍŒ–¼‚ª‚ ‚è‚Ü‚¹‚ñB"
+     message = message & "[NG]:ã“ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã«ã¯ä»¶åãŒã‚ã‚Šã¾ã›ã‚“ã€‚"
   Else
-     message = message & "Œ–¼‚ ‚è .. OK"
+     message = message & "[OK]ä»¶åã‚ã‚Š"
   End If
 
   contents = strSubject & strBody
 
-  ' “Y•tƒtƒ@ƒCƒ‹ƒ`ƒFƒbƒN
+  ' æ·»ä»˜ãƒ•ã‚¡ã‚¤ãƒ«ãƒã‚§ãƒƒã‚¯
   message = message & vbCrLf & "3/7 "
   flag = False
   If cnt = 0 Then
-    fileNames = "“Y•tƒtƒ@ƒCƒ‹–³‚µ"
-    flag = include_check_words(True, contents, "“Y•t,ˆ³k,xls,ppt,doc,zip")
+    fileNames = "æ·»ä»˜ãƒ•ã‚¡ã‚¤ãƒ«ç„¡ã—"
+    flag = include_check_words(True, contents, "æ·»ä»˜,åœ§ç¸®,xls,ppt,doc,zip")
     If flag = True Then
-       message = message & "“Y•tƒtƒ@ƒCƒ‹‚ğ–Y‚ê‚Ä‚¢‚é‰Â”\«‚ª‚ ‚è‚Ü‚·B"
+       message = message & "[WARN]:æ·»ä»˜ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å¿˜ã‚Œã¦ã„ã‚‹å¯èƒ½æ€§ãŒã‚ã‚Šã¾ã™ã€‚"
     Else
-       message = message & "“Y•t–Y‚êƒ`ƒFƒbƒN .. OK(“Y•t, zip‚È‚Ç‚ÌƒL[ƒ[ƒh‚È‚µ)"
+       message = message & "[OK]:æ·»ä»˜å¿˜ã‚Œãƒã‚§ãƒƒã‚¯(æ·»ä»˜, zipãªã©ã®ã‚­ãƒ¼ãƒ¯ãƒ¼ãƒ‰ãªã—)"
     End If
   Else
     For i = 1 To cnt
-      fileNames = fileNames & "“Y•t" & i & "F" & item.Attachments.item(i).FileName & vbCrLf
+      fileNames = fileNames & "æ·»ä»˜" & i & "ï¼š" & item.Attachments.item(i).FileName & vbCrLf
     Next i
-    message = message & "“Y•t–Y‚êƒ`ƒFƒbƒN .. OK(" & cnt & "Œ“Y•t)"
+    message = message & "[OK]:æ·»ä»˜å¿˜ã‚Œãƒã‚§ãƒƒã‚¯(" & cnt & "ä»¶æ·»ä»˜)"
   End If
 
-  ' —v’ˆÓƒ[ƒhƒ`ƒFƒbƒN
+  ' è¦æ³¨æ„ãƒ¯ãƒ¼ãƒ‰ãƒã‚§ãƒƒã‚¯
   message = message & vbCrLf & "4/7 "
   flag = False
-  flag = include_check_words(True, contents, "Œ©Ï,—\Z,Œ_–ñ,Œµ‹Ö,‹àŠz,“à,“àX") 'Confidential
+  flag = include_check_words(True, contents, "è¦‹ç©,äºˆç®—,å¥‘ç´„,å³ç¦,é‡‘é¡,å†…ç·’,å†…ã€…") 'Confidential
   If flag = True Then
-     message = message & "—v’ˆÓƒ[ƒ‹!!:d—v‚Èƒ[ƒ‹‚Å‚Í‚ ‚è‚Ü‚¹‚ñ‚©H" & vbCrLf & "    ˆ¶æ‚â“Y•tƒtƒ@ƒCƒ‹“™‚ğŠm”F‚µ‚Ä‰º‚³‚¢B"
+     message = message & "[WARN]:è¦æ³¨æ„ãƒ¡ãƒ¼ãƒ«!!:é‡è¦ãªãƒ¡ãƒ¼ãƒ«ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã‹ï¼Ÿ" & vbCrLf & "    å®›å…ˆã‚„æ·»ä»˜ãƒ•ã‚¡ã‚¤ãƒ«ç­‰ã‚’ç¢ºèªã—ã¦ä¸‹ã•ã„ã€‚"
   Else
-     message = message & "—v’ˆÓƒ[ƒhƒ`ƒFƒbƒN .. OK"
+     message = message & "[OK]:è¦æ³¨æ„ãƒ¯ãƒ¼ãƒ‰ãƒã‚§ãƒƒã‚¯"
   End If
 
-  ' ŒhÌƒ[ƒhƒ`ƒFƒbƒN
+  ' æ•¬ç§°ãƒ¯ãƒ¼ãƒ‰ãƒã‚§ãƒƒã‚¯
   message = message & vbCrLf & "5/7 "
   subContentsStr =""
   flag = False
@@ -119,14 +119,14 @@ Private Sub Application_ItemSend(ByVal item As Object, Cancel As Boolean)
   For i = LBound(includewords) To mi
     subContentsStr = subContentsStr & includewords(i)
   Next
-  flag = include_check_words(False, subContentsStr, "‚³‚ñ,—l,“a,ŠeˆÊ,’S“–Ò,‚Ç‚Ì")
+  flag = include_check_words(False, subContentsStr, "ã•ã‚“,æ§˜,æ®¿,å„ä½,æ‹…å½“è€…,ã©ã®")
   If flag = True Then
-     message = message & "ŒhÌ(—lA‚³‚ñ‚È‚Ç)‚ª‚à‚ê‚ÄŒÄ‚ÑÌ‚Ä‚É‚µ‚Ä‚¢‚Ü‚¹‚ñ‚©H"
+     message = message & "[WARN]:æ•¬ç§°(æ§˜ã€ã•ã‚“ãªã©)ãŒã‚‚ã‚Œã¦å‘¼ã³æ¨ã¦ã«ã—ã¦ã„ã¾ã›ã‚“ã‹ï¼Ÿ"
   Else
-     message = message & "ŒhÌƒ`ƒFƒbƒN .. OK"
+     message = message & "[OK]:æ•¬ç§°ãƒã‚§ãƒƒã‚¯"
   End If
 
-  ' ĞŠOƒAƒhƒŒƒXƒ`ƒFƒbƒN
+  ' ç¤¾å¤–ã‚¢ãƒ‰ãƒ¬ã‚¹ãƒã‚§ãƒƒã‚¯
   message = message & vbCrLf & "6/7 "
   existExternAddressName = ""
   existExternAddress = False
@@ -145,11 +145,11 @@ Private Sub Application_ItemSend(ByVal item As Object, Cancel As Boolean)
 
   startTime = Now
   If existExternAddress = True Then
-    externAdd = "ŠO•”ƒ[ƒ‹ƒAƒhƒŒƒXF—L(" & existExternAddressName & ")"
-    message = message & "ŠO•”ƒ[ƒ‹ƒAƒhƒŒƒX‚ªˆ¶æ‚É‚ ‚è‚Ü‚·B"
+    externAdd = "å¤–éƒ¨ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ï¼šæœ‰(" & existExternAddressName & ")"
+    message = message & "[WARN]:å¤–éƒ¨ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ãŒå®›å…ˆã«ã‚ã‚Šã¾ã™ã€‚"
   Else
-     externAdd = "ŠO•”ƒ[ƒ‹ƒAƒhƒŒƒXF‚È‚µ"
-     message = message & "ŠO•”ƒAƒhƒŒƒXƒ`ƒFƒbƒN .. OK"
+     externAdd = "å¤–éƒ¨ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ï¼šãªã—"
+     message = message & "[OK]:å¤–éƒ¨ã‚¢ãƒ‰ãƒ¬ã‚¹ãƒã‚§ãƒƒã‚¯"
   End If
 
   flag = warning_exit(True, message & vbCrLf & apdMsg)
@@ -158,12 +158,12 @@ Private Sub Application_ItemSend(ByVal item As Object, Cancel As Boolean)
     Exit Sub
   End If
 
-  ' •\¦ƒƒbƒZ[ƒW
-  message = "7/7 ÅIŠm”F‚Å‚·B‘—M‚·‚é‘O‚ÉÄ“xˆ¶æAŒ–¼A“Y•tƒtƒ@ƒCƒ‹A–{•¶‚Ì‘‚«o‚µ“™Šm”F‚µ‚Ä‚­‚¾‚³‚¢B" & vbCrLf & _
+  ' è¡¨ç¤ºãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+  message = "7/7 æœ€çµ‚ç¢ºèªã§ã™ã€‚é€ä¿¡ã™ã‚‹å‰ã«å†åº¦å®›å…ˆã€ä»¶åã€æ·»ä»˜ãƒ•ã‚¡ã‚¤ãƒ«ã€æœ¬æ–‡ã®æ›¸ãå‡ºã—ç­‰ç¢ºèªã—ã¦ãã ã•ã„ã€‚" & vbCrLf & _
     "To:" & item.To & vbCrLf & _
     "CC:" & item.CC & vbCrLf & _
     "BCC:" & item.BCC & vbCrLf & _
-    "‘—MÒ:" & item.Session.CurrentUser.Address & vbCrLf & _
+    "é€ä¿¡è€…:" & item.Session.CurrentUser.Address & vbCrLf & _
     fileNames & vbCrLf & _
     externAdd
 
@@ -172,12 +172,12 @@ Private Sub Application_ItemSend(ByVal item As Object, Cancel As Boolean)
     Exit Sub
   End If
 
-  Do While DateDiff("s", startTime, Now) < 4 '4•bˆÊ“à‚È‚çÄŠm”F
-    If MsgBox("Å‚ç‚¸Šm”F‚µ‚Ü‚µ‚å‚¤" & vbCrLf & message, vbOKCancel + vbExclamation) = vbCancel Then
+  Do While DateDiff("s", startTime, Now) < 4 '4ç§’ä½å†…ãªã‚‰å†ç¢ºèª
+    If MsgBox("ç„¦ã‚‰ãšç¢ºèªã—ã¾ã—ã‚‡ã†" & vbCrLf & message, vbOKCancel + vbExclamation) = vbCancel Then
       Cancel = True
       Exit Sub
     End If
   Loop
 
-  'MsgBox ("‘—M‚µ‚Ü‚µ‚½")
+  'MsgBox ("é€ä¿¡ã—ã¾ã—ãŸ")
 End Sub
