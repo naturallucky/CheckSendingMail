@@ -206,7 +206,6 @@ Private Sub Application_ItemSend(ByVal item As Object, Cancel As Boolean)
     "[CC]:" & appendList(item.CC) & vbCrLf & _
     "[BCC]:" & appendList(item.BCC) & vbCrLf
 
-
   If MsgBox(message, vbOKCancel + vbExclamation) = vbCancel Then
     Cancel = True
     Exit Sub
