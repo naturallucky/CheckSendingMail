@@ -21,6 +21,14 @@ Function include_check_words(includeCheck As Boolean, contents As String, includ
   include_check_words = (includeCheck = foundflag)
 End Function
 
+Private Sub Application_AdvancedSearchComplete(ByVal SearchObject As Search)
+
+End Sub
+
+Private Sub Application_BeforeFolderSharingDialog(ByVal FolderToShare As MAPIFolder, Cancel As Boolean)
+
+End Sub
+
 'メール送信時にチェックするマクロ
 '   機能：メールチェック、メール保存
 '   主なチェック項目：件名、宛先（外部アドレス）、敬称、添付、重要文言
@@ -36,6 +44,7 @@ Private Sub Application_ItemSend(ByVal item As Object, Cancel As Boolean)
   '一時保持
   Dim cnt As Integer
   Dim strAddress As String
+  Dim strSubject As String
   Dim contents As String
 
   'for output
@@ -47,10 +56,20 @@ Private Sub Application_ItemSend(ByVal item As Object, Cancel As Boolean)
   Dim i As Integer
   Dim flag As Boolean
 
+
+  If TypeOf item Is Outlook.MailItem Then
+    'MsgBox ("prop:" & item & " Mail! ")
+  Else
+    Exit Sub '会議の場合
+  End If
   ' 初期値
-  MyDomain = "goodcompay.com"  '＜自社のドメインなど＞
-  MyDomainSecond = "goodcompay.com"  '＜自社のドメインなど＞
+  MyDomain = "jp.ec.com"  '＜自社のドメインなど＞
+  MyDomainSecond = "n.co.jp"  '＜自社のドメインなど＞
+  myAddress = "" 'i@c.com"
+
   apdMsg = vbCrLf & "キャンセルを選択すると送信を中断します。"
+
+   apdMsg = vbCrLf & "キャンセルを選択すると送信を中断します。"
 
   cnt = item.Attachments.Count    ' 添付ファイル数
   strSubject = item.Subject
@@ -63,6 +82,7 @@ Private Sub Application_ItemSend(ByVal item As Object, Cancel As Boolean)
 
   ' 宛先なしチェック  ' Outlook 2010などは 標準機能でチェックされます。
   message = message & "1/7 "
+
   If item.To = "" Then
      message = message & "[NG]:宛先がありません！"
   Else
@@ -74,7 +94,10 @@ Private Sub Application_ItemSend(ByVal item As Object, Cancel As Boolean)
   If strSubject = "" Then
      message = message & "[NG]:このメッセージには件名がありません。"
   Else
-     message = message & "[OK]件名あり"
+     message = message & "[OK]:件名あり"
+  End If
+  If InStr(strSubject, "UNCHECKED") > 0 Then
+    message = message & "(余計な文字あり)"
   End If
 
   contents = strSubject & strBody
@@ -109,7 +132,7 @@ Private Sub Application_ItemSend(ByVal item As Object, Cancel As Boolean)
 
   ' 敬称ワードチェック
   message = message & vbCrLf & "5/7 "
-  subContentsStr =""
+  subContentsStr = ""
   flag = False
   includewords = Split(strBody, ",")
   m = UBound(includewords)
@@ -130,26 +153,42 @@ Private Sub Application_ItemSend(ByVal item As Object, Cancel As Boolean)
   message = message & vbCrLf & "6/7 "
   existExternAddressName = ""
   existExternAddress = False
+  myadrflag = False
 
   For i = 1 To item.Recipients.Count
     With item.Recipients.item(i)
       strAddress = .Address
       If Not (strAddress Like "*" & MyDomain & "*" Or _
-          strAddress Like "*" & MyDomainSecond & "*" _
+          strAddress Like "*" & MyDomainSecond & "*"  _
           ) Then
         existExternAddress = True
         existExternAddressName = existExternAddressName & strAddress & " "
       End If
+      
+       
+      
+      'MsgBox strAddress & "," & myAddress & " | " _
+      '& (myAddress = strAddress) & "," & (strAddress = myAddress)
+      If strAddress = myAddress Then
+        myadrflag = True
+      End If
     End With
   Next
 
-  startTime = Now
+  StartTime = Now
   If existExternAddress = True Then
     externAdd = "外部メールアドレス：有(" & existExternAddressName & ")"
     message = message & "[WARN]:外部メールアドレスが宛先にあります。"
   Else
      externAdd = "外部メールアドレス：なし"
      message = message & "[OK]:外部アドレスチェック"
+  End If
+  
+  message = message & vbCrLf & "   "
+  If myadrflag = True Then
+        message = message & "([OK]:my address あり)"
+    Else
+        message = message & "([WARN]:my address無し)"
   End If
 
   flag = warning_exit(True, message & vbCrLf & apdMsg)
@@ -160,24 +199,43 @@ Private Sub Application_ItemSend(ByVal item As Object, Cancel As Boolean)
 
   ' 表示メッセージ
   message = "7/7 最終確認です。送信する前に再度宛先、件名、添付ファイル、本文の書き出し等確認してください。" & vbCrLf & _
-    "To:" & item.To & vbCrLf & _
-    "CC:" & item.CC & vbCrLf & _
-    "BCC:" & item.BCC & vbCrLf & _
-    "送信者:" & item.Session.CurrentUser.Address & vbCrLf & _
+    "送信者:" & appendList(item.Session.CurrentUser.Address) & vbCrLf & _
     fileNames & vbCrLf & _
-    externAdd
+    externAdd & vbCrLf & vbCrLf & _
+    "[To]:" & appendList(item.To) & vbCrLf & _
+    "[CC]:" & appendList(item.CC) & vbCrLf & _
+    "[BCC]:" & appendList(item.BCC) & vbCrLf
+
 
   If MsgBox(message, vbOKCancel + vbExclamation) = vbCancel Then
     Cancel = True
     Exit Sub
   End If
 
-  Do While DateDiff("s", startTime, Now) < 4 '4秒位内なら再確認
+
+  Do While DateDiff("s", StartTime, Now) < 3.7 '4秒位内なら再確認
     If MsgBox("焦らず確認しましょう" & vbCrLf & message, vbOKCancel + vbExclamation) = vbCancel Then
       Cancel = True
       Exit Sub
     End If
   Loop
 
-  'MsgBox ("送信しました")
+  If (Hour(Now) >= 11 And Hour(Now) <= 13) Or (Hour(Now) >= 18) Then
+    MsgBox ("送信フォルダに格納します。" & vbCrLf & "送信確認してください。")
+  End If
 End Sub
+' 宛先などのアドレスを見やすくする関数
+Private Function appendList(strName As String)
+    Dim re As RegExp
+    Dim mc As MatchCollection
+        
+    Set re = New RegExp
+    re.Global = True
+    
+    re.Pattern = "[ ]*;[ ]*"
+    strName = re.Replace(strName, vbCrLf)
+
+    re.Pattern = "/.*cn=([^/]+)"
+    appendList = re.Replace(strName, "$1")
+
+End Function
